@@ -68,6 +68,7 @@ Starts the auto-leader rotation timer. A random eligible online player (Survival
 - If `min` equals `max`, the interval is fixed.
 - The previous auto-leader's temporary leader status is removed when a new leader is selected.
 - Players in Creative or Spectator mode are excluded from selection.
+- If the timer is already running, calling `start` again immediately re-elects a new leader using the new timing bounds. Useful for Twitch bot triggers that don't track state.
 
 **Example:** `/trailblazer autoleader start 120 300`
 
@@ -79,9 +80,21 @@ Stops the auto-leader timer, hides the boss bar, and removes the current auto-le
 
 ---
 
+### `/trailblazer autoleader set <player> [reason...]`
+
+Immediately assigns a specific online player as the current auto-leader, cancelling the active countdown and starting a fresh one. Requires the auto-leader system to already be running.
+
+- If a reason is provided it is broadcast server-wide (e.g. `won the viewer vote`, `raid reward`).
+- Without a reason, uses the standard leader-chosen broadcast.
+- The previous auto-leader loses their role immediately.
+
+**Example:** `/trailblazer autoleader set Steve won the viewer poll`
+
+---
+
 ### `/trailblazer reload`
 
-Reloads `config.yml` and `whitelist.yml` from disk. Any active temporary leader expiry timers are cancelled before the reload.
+Reloads `config.yml` and `whitelist.yml` from disk. Active temporary leaders, their expiry timers, and the current auto-leader are all preserved — only config values and the permanent leaders list are updated.
 
 Requires `trailblazer.admin`.
 

@@ -11,6 +11,7 @@ messages:
   temp-leader-removed: "<aqua><player></aqua><red> is no longer a temporary leader</red>"
   perm-leader-removed: "<aqua><player></aqua><red> is no longer a permanent leader</red>"
   auto-leader-chosen: "<light_purple>►</light_purple> <aqua><player> <green>has been chosen as current leader</green></aqua>"
+  auto-leader-set: "<light_purple>►</light_purple> <aqua><player> <green>has been set as current leader: <yellow><reason></yellow></green></aqua>"
   auto-leader-bossbar: "<yellow>Leader: </yellow><aqua><player></aqua> <gray>(<remaining>)</gray>"
   auto-leader-selecting: "<red>Selecting new leader...</red>"
   auto-leader-none: "<gray>No leader selected</gray>"

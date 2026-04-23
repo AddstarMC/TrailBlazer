@@ -52,9 +52,13 @@ public class AutoLeaderBar {
      * @param maxTimeSecs maximum interval (seconds)
      * @return false if it was already running
      */
+    public boolean isSelecting() {
+        return isSelecting;
+    }
+
     public boolean startTimer(int minTimeSecs, int maxTimeSecs) {
         DebugLogger.debug("startTimer() was called");
-        if (isRunning() || isSelecting) return false;
+        if (isSelecting) return false;
 
         if (minTimeSecs > maxTimeSecs) {
             int temp = minTimeSecs;
@@ -65,6 +69,63 @@ public class AutoLeaderBar {
         this.maxTime = Math.max(this.minTime, maxTimeSecs);
         chooseNewLeader();
         return true;
+    }
+
+    public void setSpecificLeader(Player player, String reason) {
+        DebugLogger.debug("setSpecificLeader() called for " + player.getName());
+        if (task != null) { task.cancel(); task = null; }
+        if (selectionTask != null) { selectionTask.cancel(); selectionTask = null; }
+        isSelecting = false;
+
+        UUID prevLeaderUuid = plugin.getLeaderManager().getAutoLeaderUuid();
+        if (prevLeaderUuid != null) {
+            plugin.getLeaderManager().removeTemporaryLeader(prevLeaderUuid, false);
+        }
+
+        plugin.getLeaderManager().setAutoLeader(player.getUniqueId());
+        plugin.getLeaderManager().addTemporaryLeader(player.getUniqueId(), maxTime + 10, null);
+
+        if (reason != null && !reason.isBlank()) {
+            Bukkit.getServer().sendMessage(
+                config.getMessage("messages.auto-leader-set", Map.of(
+                    "player", player.getName(),
+                    "reason", reason
+                ))
+            );
+        } else {
+            Bukkit.getServer().sendMessage(
+                config.getMessage("messages.auto-leader-chosen", Map.of(
+                    "player", player.getName()
+                ))
+            );
+        }
+
+        boolean sameLeader = player.getUniqueId().equals(prevLeaderUuid);
+        if (!sameLeader) {
+            Player prevPlayer = prevLeaderUuid != null ? Bukkit.getPlayer(prevLeaderUuid) : null;
+            if (prevPlayer != null && prevPlayer.isOnline()) {
+                prevPlayer.showTitle(Title.title(
+                    Component.text("Leader role lost!", NamedTextColor.RED),
+                    Component.text("You are no longer the leader", NamedTextColor.DARK_RED),
+                    Title.Times.times(Duration.ofMillis(800), Duration.ofSeconds(3), Duration.ofMillis(600))
+                ));
+            }
+            player.playSound(player.getLocation(), "minecraft:block.note_block.chime", 1.0f, 1.0f);
+            player.showTitle(Title.title(
+                Component.text("Leader role gained", NamedTextColor.GREEN),
+                Component.text("You are now the new leader", NamedTextColor.DARK_GREEN),
+                Title.Times.times(Duration.ofMillis(800), Duration.ofSeconds(3), Duration.ofMillis(600))
+            ));
+        } else {
+            player.playSound(player.getLocation(), "minecraft:block.note_block.chime", 1.0f, 1.0f);
+            player.showTitle(Title.title(
+                Component.text("Continue leading", NamedTextColor.AQUA),
+                Component.text("You have retained the leader role", NamedTextColor.DARK_AQUA),
+                Title.Times.times(Duration.ofMillis(800), Duration.ofSeconds(3), Duration.ofMillis(600))
+            ));
+        }
+
+        scheduleNextRun();
     }
 
     /**

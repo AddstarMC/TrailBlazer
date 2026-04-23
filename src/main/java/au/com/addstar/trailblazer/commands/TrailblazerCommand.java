@@ -10,6 +10,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -251,33 +252,53 @@ public class TrailblazerCommand implements CommandExecutor {
 
     private void handleAutoLeader(CommandSender sender, String[] args) {
         if (args.length < 2) {
-            sender.sendMessage(MessageUtil.mm("<red>Usage: /trailblazer autoleader [start|stop] <min> <max>"));
+            sender.sendMessage(MessageUtil.mm("<red>Usage: /trailblazer autoleader <start|stop|set> ..."));
             return;
         }
         AutoLeaderBar autoLeaderBar = plugin.getAutoLeaderBar();
-        if (args[1].equalsIgnoreCase("start")) {
-            if (args.length < 4) {
-                sender.sendMessage(MessageUtil.mm("<red>Usage: /trailblazer autoleader start <min> <max></red>"));
-                return;
-            }
-            try {
-                if (autoLeaderBar.isRunning()) {
-                    sender.sendMessage(MessageUtil.mm("<red>Auto leader is already running.</red>"));
+        switch (args[1].toLowerCase()) {
+            case "start" -> {
+                if (args.length < 4) {
+                    sender.sendMessage(MessageUtil.mm("<red>Usage: /trailblazer autoleader start <min> <max></red>"));
                     return;
                 }
-
-                int min = Integer.parseInt(args[2]);
-                int max = Integer.parseInt(args[3]);
-                autoLeaderBar.startTimer(min, max);
-                sender.sendMessage(MessageUtil.mm("<green>Auto leader started with min: " + min + " and max: " + max + "</green>"));
-            } catch (NumberFormatException e) {
-                sender.sendMessage(MessageUtil.mm("<red>Invalid number: <gray>" + args[2] + "</gray> or <gray>" + args[3] + "</gray>"));
+                try {
+                    int min = Integer.parseInt(args[2]);
+                    int max = Integer.parseInt(args[3]);
+                    if (!autoLeaderBar.startTimer(min, max)) {
+                        sender.sendMessage(MessageUtil.mm("<red>Cannot start: leader selection is already in progress.</red>"));
+                        return;
+                    }
+                    sender.sendMessage(MessageUtil.mm("<green>Auto leader started with min: " + min + " and max: " + max + "</green>"));
+                } catch (NumberFormatException e) {
+                    sender.sendMessage(MessageUtil.mm("<red>Invalid number: <gray>" + args[2] + "</gray> or <gray>" + args[3] + "</gray>"));
+                }
             }
-        } else if (args[1].equalsIgnoreCase("stop")) {
-            autoLeaderBar.stopTimer();
-            sender.sendMessage(MessageUtil.mm("<green>Auto leader stopped.</green>"));
-        } else {
-            sender.sendMessage(MessageUtil.mm("<red>Invalid command. Use /trailblazer autoleader start|stop</red>"));
+            case "stop" -> {
+                autoLeaderBar.stopTimer();
+                sender.sendMessage(MessageUtil.mm("<green>Auto leader stopped.</green>"));
+            }
+            case "set" -> {
+                if (args.length < 3) {
+                    sender.sendMessage(MessageUtil.mm("<red>Usage: /trailblazer autoleader set <player> [reason...]</red>"));
+                    return;
+                }
+                if (!autoLeaderBar.isRunning() && !autoLeaderBar.isSelecting()) {
+                    sender.sendMessage(MessageUtil.mm("<red>Auto leader is not running.</red>"));
+                    return;
+                }
+                Player target = Bukkit.getPlayerExact(args[2]);
+                if (target == null) {
+                    sender.sendMessage(MessageUtil.mm("<red>Player not found or not online.</red>"));
+                    return;
+                }
+                String reason = args.length > 3
+                        ? String.join(" ", Arrays.copyOfRange(args, 3, args.length))
+                        : null;
+                autoLeaderBar.setSpecificLeader(target, reason);
+                sender.sendMessage(MessageUtil.mm("<green>Set <aqua>" + target.getName() + "</aqua> as leader.</green>"));
+            }
+            default -> sender.sendMessage(MessageUtil.mm("<red>Invalid command. Use /trailblazer autoleader start|stop|set</red>"));
         }
     }
 }
