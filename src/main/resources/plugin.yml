@@ -1,0 +1,15 @@
+name: TrailBlazer
+version: '1.0.0'
+main: au.com.addstar.trailblazer.TrailblazerPlugin
+api-version: '1.21'
+description: Tracker for stats used to generate Wrapped
+commands:
+  trailblazer:
+    description: Trailblazer plugin commands
+    usage: /<command> <unlock|stats|addleader|removeleader|reload>
+    permission: trailblazer.admin
+    permission-message: "<red>You don't have permission to use this command.</red>"
+permissions:
+  trailblazer.admin:
+    description: Allows access to Trailblazer commands
+    default: op

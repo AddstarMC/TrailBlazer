@@ -1,0 +1,20 @@
+messages:
+  block-break-not-allowed: "<bold><red>Unable to break block - Leader must do it first!</red></bold>"
+  block-place-not-allowed: "<bold><red>Unable to place block - Leader must do it first!</red></bold>"
+  craft-not-allowed: "<bold><red>Unable to craft item - Leader must do it first!</red></bold>"
+  interact-not-allowed: "<bold><red>Unable to do that - Leader must do it first!</red></bold>"
+  kill-not-allowed: "<bold><red>Unable to kill - Leader must do it first!</red></bold>"
+  portal-not-allowed: "<bold><red>Unable to use portal - Leader must do it first!</red></bold>"
+  chat-unlock: "<light_purple>►</light_purple> <aqua><player> <green>unlocked:</green> <gold><action></gold> <yellow><item></yellow></aqua>"
+  bossbar-unlock: "<aqua><player> <green>unlocked:</green> <gold><action></gold> <yellow><item></yellow></aqua>"
+  temp-leader-added: "<aqua><player></aqua><green> is now a leader <dark_green>(for <duration>)</dark_green>: <yellow><reason></yellow></green>"
+  temp-leader-removed: "<aqua><player></aqua><red> is no longer a temporary leader</red>"
+  perm-leader-removed: "<aqua><player></aqua><red> is no longer a permanent leader</red>"
+  auto-leader-chosen: "<light_purple>►</light_purple> <aqua><player> <green>has been chosen as current leader</green></aqua>"
+  auto-leader-bossbar: "<yellow>Leader: </yellow><aqua><player></aqua> <gray>(<remaining>)</gray>"
+  auto-leader-selecting: "<red>Selecting new leader...</red>"
+  auto-leader-none: "<gray>No leader selected</gray>"
+  auto-leader-left: "<red>Leader has left the game - Selecting new leader</red>"
+select-new-leader-on-quit: false
+allow-repeat-leader: true
+permanent-leaders: []
